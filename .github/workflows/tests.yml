@@ -1,0 +1,33 @@
+name: e2e
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '17 9 * * *' # nightly: catches app-under-test and API drift between pushes
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      # Deliberately NOT fail-fast: the matrix exists to isolate
+      # browser-specific defects, not to mask them behind an early abort.
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, mobile-chrome]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npx playwright test --project=${{ matrix.project }}
+        env:
+          CI: true # enables forbidOnly — a stray test.only fails the build
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: playwright-report/
+          retention-days: 14

@@ -1,0 +1,17 @@
+{
+  "name": "qa-portfolio",
+  "version": "1.0.0",
+  "description": "Playwright E2E, accessibility, and API-contract test suite for TodoMVC — QA/SDET portfolio project",
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1"
+  }
+}
