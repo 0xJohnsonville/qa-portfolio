@@ -2,9 +2,14 @@
 
 Copy the template, fill every field. A report that can't be reproduced from
 its own steps is a rumor, not a report. The worked example below (TODO-1042)
-is a real defect in the app under test, kept open on purpose — the suite's
-`filter selection survives reload` test fails against it by design and acts
-as the living regression check.
+is a real defect in a third-party app under test, kept open on purpose — the
+suite's `todos persist across reload (TodoMVC spec conformance)` test in
+`tests/conformance.spec.js` asserts the spec's required behavior and acts as
+the living regression check. Because the defect is upstream and unfixable
+from this repo, that test is marked `test.fail()`: it runs every time and is
+recorded as an **expected** failure, so CI stays green while the bug is open
+— and goes **red the moment the bug is fixed**, which is the signal that this
+report should be closed and the test deleted.
 
 ---
 
@@ -72,5 +77,9 @@ render at all, since the app treats it as an empty state.)
 
 **Notes / suspected cause** No write to localStorage is observable during
 add/toggle (Application → Local Storage stays empty), so this is absent
-persistence, not failed rehydration. The regression check lives in
-`tests/conformance.spec.js` and stays red until the build conforms.
+persistence, not failed rehydration. Re-verified 2026-09-22: `localStorage`
+is still `[]` immediately after adding a todo, and the post-reload footer
+still reads "0 items left!". The regression check lives in
+`tests/conformance.spec.js`, marked `test.fail()` — it keeps running and
+keeps failing as expected until the build conforms, at which point it flips
+the build red to prompt closing this report.

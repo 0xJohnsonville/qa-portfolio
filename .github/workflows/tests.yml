@@ -16,16 +16,16 @@ jobs:
       matrix:
         project: [chromium, firefox, mobile-chrome]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npx playwright test --project=${{ matrix.project }}
         env:
           CI: true # enables forbidOnly — a stray test.only fails the build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report-${{ matrix.project }}

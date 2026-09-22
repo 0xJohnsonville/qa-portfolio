@@ -68,17 +68,36 @@ The suite's one deliberate failure is now a **verified** defect:
 `conformance.spec.js` fails against the classic reference build, which ships
 no localStorage persistence at all — reload deletes the user's entire list
 (TODO-1042, worked report in `BUG_REPORT_TEMPLATE.md`, reproduced 10/10 per
-browser). The test asserts the spec's required behavior and stays red until
-the build conforms — a living regression check; green-by-skipping would just
-hide a real defect. Expected suite result: **25 pass / 1 fail per project**.
+browser). The test asserts the spec's required behavior — green-by-skipping
+would just hide a real defect.
+
+Because that build is **third-party**, the assertion can never be made to
+pass from inside this repo. Leaving it to fail the build conflated two
+different signals — "the known upstream defect is still there" and
+"something in this suite broke" — and produced a standing red build, which
+is indistinguishable from neglect and trains readers to ignore CI. The test
+is therefore marked `test.fail()` at its definition: it still executes on
+every run and still asserts the spec, but a failure is recorded as
+**expected** and the suite exits 0.
+
+This is stricter than a raw red build, not laxer. The alert is inverted: if
+upstream ever ships persistence, the assertion passes, Playwright reports
+"expected to fail but passed", and **the build goes red** — which is exactly
+when a human is needed, to close TODO-1042 and delete the test. Under the
+old arrangement an upstream fix would have silently turned the suite green
+and the bug report would have quietly gone stale.
+
+Expected suite result: **26 tests per project — 25 passing, 1 expected
+failure, exit code 0**.
 
 ## 6. Entry / exit criteria
 
 **Entry**: `npm ci && npx playwright install --with-deps` completes; app URL
 reachable; suite runs headless.
 
-**Exit (per change)**: 25/26 green per project with the single expected
-TODO-1042 failure; zero unexpected failures; no `test.only` in the diff;
+**Exit (per change)**: per project, 25 passing + 1 expected TODO-1042
+failure and a **zero exit code**; zero unexpected failures and zero
+unexpected passes; no `test.only` in the diff;
 a11y gate (impact ≥ serious, contrast excluded) empty; API contract intact.
 Any unexpected red blocks merge until root-caused — fix the test only if the
 test was wrong, fix the code if the code was.

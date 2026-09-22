@@ -9,9 +9,10 @@ module.exports = defineConfig({
   // reports green — make it fail the build instead.
   forbidOnly: !!process.env.CI,
 
-  // Deterministic runs: the suite carries one deliberately failing test
-  // (TODO-1042, see docs/BUG_REPORT_TEMPLATE.md); retries would just run the
-  // documented bug twice.
+  // Deterministic runs: the suite carries one known-failing test (TODO-1042,
+  // see docs/BUG_REPORT_TEMPLATE.md), marked test.fail() at its definition
+  // so that documented upstream defect is an EXPECTED failure rather than a
+  // permanently red build. Retries would just run the documented bug twice.
   retries: 0,
 
   // Fail-fast intentionally NOT configured (no maxFailures): the cross-browser
